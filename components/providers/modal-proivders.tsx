@@ -1,7 +1,6 @@
 "use client"
 
 import {useEffect, useState} from "react";
-import CarTest1Modal from "@/components/modules/car-test1-modal";
 
 export const ModalProvider = () => {
     const [isMounted, setIsMounted] = useState(false)
@@ -14,7 +13,6 @@ export const ModalProvider = () => {
 
     return (
         <>
-            <CarTest1Modal/>
         </>
     )
 }
