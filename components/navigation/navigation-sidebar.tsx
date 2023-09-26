@@ -11,24 +11,27 @@ const NavigationSidebar = () => {
 
         >
             <NavigationAction
-                label="home"
+                title="主页"
+                label="go to the home"
                 destination="/"
             >
                 <Home className="group-hover:text-white transition text-emerald-500"
+                      size={25}
+                />
+            </NavigationAction>
+
+            <NavigationAction
+                title="科目一"
+                label="科目一练习"
+                destination="/car/test1"
+            >
+                <Car className="group-hover:text-white transition text-emerald-500"
                      size={25}
                 />
             </NavigationAction>
 
             <NavigationAction
-            label="科目一练习"
-            destination="/car/test1"
-            >
-                <Car className="group-hover:text-white transition text-emerald-500"
-                    size={25}
-                />
-            </NavigationAction>
-
-            <NavigationAction
+                title="科目四"
                 label="科目四练习"
                 destination="/car/test4"
             >
