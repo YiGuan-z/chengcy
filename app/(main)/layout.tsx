@@ -1,4 +1,5 @@
 import NavigationSidebar from "@/components/navigation/navigation-sidebar";
+import {Toaster} from "@/components/ui/toaster";
 
 const MainLayout = ({children}: { children: React.ReactNode }) => {
     return (
@@ -9,6 +10,7 @@ const MainLayout = ({children}: { children: React.ReactNode }) => {
             </div>
             <main className="md:pl-[84px] h-full">
                 {children}
+                <Toaster/>
             </main>
         </div>
     )
