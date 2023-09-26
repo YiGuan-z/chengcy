@@ -3,7 +3,7 @@ import type {Metadata} from 'next'
 import {Inter} from 'next/font/google'
 import {cn} from "@/lib/utils";
 import {ThemeProvider} from "@/components/theme-provider";
-import NavigationSidebar from "@/components/navigation/navigation-sidebar";
+import {ModalProvider} from "@/components/providers/modal-proivders";
 
 const font = Inter({subsets: ['latin']})
 
@@ -31,6 +31,7 @@ export default function RootLayout({
                 enableSystem={true}
                 storageKey="chengcy.top"
             >
+                {/*<ModalProvider/>*/}
                 {children}
             </ThemeProvider>
         </div>
