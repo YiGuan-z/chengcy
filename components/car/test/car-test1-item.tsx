@@ -18,7 +18,7 @@ const CarTest1Item = ({
                       }: CarTest1ItemProps) => {
     const {multiChoiceAnswer} = item
 
-    const onClick = useCallback((symbol:string) => {
+    const onClick = useCallback((symbol: string) => {
         const symbol1 = symbol.toUpperCase();
         if (multiChoiceAnswer === symbol1) {
             onSuccess(item)
@@ -52,20 +52,25 @@ const CarTest1Item = ({
     return (
         <div className="h-full w-9/12">
             <div className="p-6">
-                <div>
+                <div className="">
                     {item?.qname}
                     {item.imgurl != "" && (
-                        <Image src={item.imgurl} width={600} height={300} className="w-auto h-auto" alt={item.qname}/>
+                        <Image src={item.imgurl}
+                               width={500}
+                               height={300}
+                               className="h-40 w-40 mx-auto"
+                               alt={item.qname}/>
                     )}
                 </div>
                 <div className="flex flex-wrap justify-around p-6 ">
                     {item?.items?.map(item => (
                         <Button
-                            className="text-white bg-emerald-600 hover:bg-emerald-700
-                             focus:ring-4 focus:ring-emerald-500 font-medium rounded-lg
-                             w-5/12 h-1/2 mt-4
-                             md:w-1/3 md:h-1/4
-                             "
+                            variant="green1"
+                            className="
+                                w-full
+                                m-2
+                                sm:text-sm
+                            "
                             key={item.symbol}
                             onClick={() => onClick(item.symbol)}>
                             {item.name}

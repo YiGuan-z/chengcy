@@ -213,11 +213,11 @@ export const CarTestPage = ({
                     再来一套
                 </Button>
             </div>
-            <div className="fixed bottom-0 right-0 flex justify-end">
+            <div className="fixed bottom-0 right-0 flex justify-end p-3">
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger>
-                            <div role="button" tabIndex={0} className="mr-2 h-20 w-40 md:h-15 md:w-25 bg-blue-600
+                            <div role="button" tabIndex={0} className="mr-2 h-1/2 p-6 w-auto bg-blue-600
                              hover:bg-blue-600/90 dark:bg-white dark:hover:bg-zinc-400 text-white dark:text-zinc-500 rounded
                              flex items-center justify-center" onClick={prevClick}>
                                 <p>上一题</p>
@@ -229,7 +229,7 @@ export const CarTestPage = ({
                     </Tooltip>
                     <Tooltip>
                         <TooltipTrigger>
-                            <div role="button" tabIndex={0} className="ml-2 h-20 w-40 md:h-15 md:w-25 bg-blue-600
+                            <div role="button" tabIndex={0} className="ml-2 h-1/2 p-6 w-auto bg-blue-600
                              hover:bg-blue-600/90 dark:bg-white dark:hover:bg-zinc-400 rounded text-white dark:text-zinc-500
                              flex items-center justify-center" onClick={nextClick}>
                                 <p>下一题</p>
@@ -241,7 +241,7 @@ export const CarTestPage = ({
                     </Tooltip>
                 </TooltipProvider>
             </div>
-            <div className="fixed bottom-0 p-3">
+            <div className="fixed bottom-0 p-3 md:font-mono">
                 分数:
                 <span className="font-bold">{successAnswerCount()}/{testPack.test.length}</span>
                 错误:
