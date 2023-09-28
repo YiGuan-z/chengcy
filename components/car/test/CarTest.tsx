@@ -9,6 +9,9 @@ import CarTest1Item from "@/components/car/test/car-test1-item";
 import {Button} from "@/components/ui/button";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {useCarTests} from "@/hooks/use-car-tests";
+import {useStore} from "zustand";
+import {Statistics, useStatistics} from "@/hooks/use-statistics";
+import {store} from "next/dist/build/output/store";
 
 export interface CarTestProps {
     url: string
@@ -31,31 +34,39 @@ export const CarTestPage = ({
     const carTests = useCarTests()
     const testPack = carTests[storeKey];
     const setTestPack = carTests[setStoreKey]
+    //数据统计api
+    const {getStatisticsByKey, setStatisticsByKey,removeStatisticsByKey} = useStatistics()
+    //初始化统计数据
+    //如果数据不存在，则对数据进行初始化。
+    useEffect(() => {
+        console.log(getStatisticsByKey(storeKey))
+        if (!getStatisticsByKey(storeKey)) {
+            setStatisticsByKey(storeKey, {
+                successIds: [],
+                failedIds: [],
+                answeredIds: [],
+                currentId: ""
+            })
+        }
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    //获取题目位置
+    const getCurrentOffset = useCallback(() => {
+        const statistics = getStatisticsByKey(storeKey)
+        if (!statistics) return 0
+        if (statistics.currentId=="") return 0
+        return statistics.answeredIds.findIndex((id)=>id===statistics.currentId);
+    }, [getStatisticsByKey, storeKey]);
     //当前游标
-    const [offset, setOffset] = useState(0)
+    const [offset, setOffset] = useState(getCurrentOffset())
+    const currentTest = testPack?.test[offset]
     const [mounted, isMounted] = useState(false)
 
     const getData = async () => {
-        const response = await fetch(`${origin}${url}`).then()
+        const response = await fetch(`${origin}${url}`)
         const carTest1Data: CarTest[] = await response.json()
         return carTest1Data
     }
-
-    const prevClick = useCallback(() => {
-        if (offset != 0) {
-            setOffset(offset - 1)
-        } else {
-            toast({
-                title: "已经是第一题了",
-                variant: "destructive",
-                description: "上一题？没有！"
-            })
-        }
-    }, [offset, toast])
-
-    const nextClick = useCallback(() => {
-        setOffset(offset + 1)
-    }, [offset])
 
     useEffect(() => {
         isMounted(true)
@@ -66,27 +77,23 @@ export const CarTestPage = ({
         if (!testPack) {
             const fetchData = async () => {
                 const data = await getData()
-                // setCarTests(data)
                 setTestPack({
                     test: data,
-                    successIds: new Set(),
-                    failedIds: new Set(),
-                    oldIds: new Set()
                 })
+                //在40行已经对数据进行了初始化，所以这里不会为空
+                //将当前回答的id设置到存储中。
+                const statistics = getStatisticsByKey(storeKey);
+                if (statistics!.currentId == "") {
+                    statistics!.currentId = data[0].id
+                    console.log(`ser`,statistics)
+                    setStatisticsByKey(storeKey, statistics!)
+                }
             }
             fetchData().catch(err => toast({
                 variant: "destructive",
                 title: "发生了一点异常",
                 description: err.message,
             }))
-        }
-        if (testPack) {
-            setTestPack({
-                test: testPack.test,
-                successIds: new Set(),
-                failedIds: new Set(),
-                oldIds: new Set()
-            })
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -101,6 +108,47 @@ export const CarTestPage = ({
         }, 3 * 1000)
 
     }, [toast]);
+
+
+    const statistics = getStatisticsByKey(storeKey)!
+
+    const nextClick = useCallback(() => {
+        setOffset(offset + 1)
+
+        statistics.currentId = currentTest?.id || ""
+        setStatisticsByKey(storeKey,statistics)
+    }, [currentTest?.id, offset, setStatisticsByKey, statistics, storeKey])
+
+    const prevClick = useCallback(() => {
+        if (offset != 0) {
+            setOffset(offset - 1)
+        } else {
+            toast({
+                title: "已经是第一题了",
+                variant: "destructive",
+                description: "上一题？没有！"
+            })
+        }
+    }, [offset, toast])
+
+    const successAnswerCount = useCallback(() => {
+        return statistics.successIds.length
+    }, [statistics?.successIds.length]);
+
+    const failAnswerCount = useCallback(() => {
+        return statistics.failedIds.length
+    }, [statistics?.failedIds.length]);
+
+    const oldAnswerCount = useCallback(() => {
+        return statistics.answeredIds.length
+    }, [statistics?.answeredIds.length]);
+
+    const reset = useCallback(() => {
+        carTests[clearKey]()
+        removeStatisticsByKey(storeKey)
+        window.location.reload()
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleKeyUpProcess = useCallback((e: KeyboardEvent) => {
         switch (e.key) {
@@ -131,23 +179,6 @@ export const CarTestPage = ({
         return null
     }
 
-    const currentTest = testPack.test[offset]
-
-    const successAnswerCount = () => {
-        return testPack.successIds.size
-    }
-    const failAnswerCount = () => {
-        return testPack.failedIds.size
-    }
-    const oldAnswerCount = () => {
-        return testPack.oldIds.size
-    }
-
-    const reset = () => {
-        carTests[clearKey]()
-        window.location.reload()
-    }
-
     if (currentTest == null) {
         return (
             <Button variant="green"
@@ -158,26 +189,18 @@ export const CarTestPage = ({
     }
 
     const onSuccess = (id: string) => {
-        const {successIds, oldIds} = testPack
-        successIds.add(id)
-        oldIds.add(id)
-        setTestPack({
-            ...testPack,
-            successIds,
-            oldIds
-        })
+        const {successIds, answeredIds} = statistics
+        successIds.push(id)
+        answeredIds.push(id)
+        setStatisticsByKey(storeKey, statistics)
         nextClick()
     }
 
     const onFail = (id: string) => {
-        const {failedIds, oldIds} = testPack
-        failedIds.add(id)
-        oldIds.add(id)
-        setTestPack({
-            ...testPack,
-            failedIds,
-            oldIds
-        })
+        const {failedIds, answeredIds} = statistics
+        failedIds.push(id)
+        answeredIds.push(id)
+        setStatisticsByKey(storeKey, statistics)
         let answer = currentTest.items.filter(item => currentTest.multiChoiceAnswer.startsWith(item.symbol))[0].name
         answer = answer.substring(answer.indexOf("：") + 1, answer.length)
         toast({
@@ -187,7 +210,6 @@ export const CarTestPage = ({
         })
         nextClick()
     }
-
 
 
     return (
