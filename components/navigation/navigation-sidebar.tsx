@@ -1,7 +1,8 @@
+import {Car, Home} from "lucide-react";
+
 import {ModeToggle} from "@/components/mode-toggle";
 import {Separator} from "@/components/ui/separator";
 import NavigationAction from "@/components/navigation/navigation-action";
-import {Car, Home} from "lucide-react";
 
 const NavigationSidebar = () => {
     return (

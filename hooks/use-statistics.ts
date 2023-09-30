@@ -62,8 +62,9 @@ export const useStatistics = create(
                 getItem: (name) => {
                     const str = localStorage.getItem(name) || ""
                     const json = JSON.parse(str)
-                    const element = json.state.statistics;
+                    const element = json.state.statistics as Array<unknown>;
                     const map = arrayToMap(element);
+                    // const map = element.toMap();
                     return {
                         ...json,
                         state: {

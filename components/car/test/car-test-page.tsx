@@ -7,11 +7,10 @@ import {useOrigin} from "@/hooks/use-origin";
 import {useToast} from "@/components/ui/use-toast";
 import CarTest1Item from "@/components/car/test/car-test1-item";
 import {Button} from "@/components/ui/button";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {useCarTests} from "@/hooks/use-car-tests";
-import {useStore} from "zustand";
-import {Statistics, useStatistics} from "@/hooks/use-statistics";
-import {store} from "next/dist/build/output/store";
+import {useStatistics} from "@/hooks/use-statistics";
+import CarTestStatistics from "@/components/car/test/car-test-statistics";
+import CarTestRightBottomButton from "@/components/car/test/car-test-right-bottom-button";
 
 export interface CarTestProps {
     url: string
@@ -35,12 +34,11 @@ export const CarTestPage = ({
     const testPack = carTests[storeKey];
     const setTestPack = carTests[setStoreKey]
     //数据统计api
-    const {getStatisticsByKey, setStatisticsByKey, removeStatisticsByKey,hasKey,initStatisticsByKey} = useStatistics()
+    const {getStatisticsByKey, setStatisticsByKey, hasKey, initStatisticsByKey} = useStatistics()
     //初始化统计数据
     //如果数据不存在，则对数据进行初始化。
     useEffect(() => {
-        if (!hasKey(storeKey)){
-            console.log(getStatisticsByKey(storeKey))
+        if (!hasKey(storeKey)) {
             initStatisticsByKey(storeKey)
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,19 +48,18 @@ export const CarTestPage = ({
         const statistics = getStatisticsByKey(storeKey)
         if (!statistics) return 0
         if (statistics.currentId == "") return 0
-        return statistics.answeredIds.findIndex((id) => id === statistics.currentId)+1;
+        return statistics.answeredIds.findIndex((id) => id === statistics.currentId) + 1;
     }, [getStatisticsByKey, storeKey]);
     //当前游标
     const [offset, setOffset] = useState(getCurrentOffset())
     const currentTest = testPack?.test[offset]
     const [mounted, isMounted] = useState(false)
-
-
+    //音频
+    // useSound()
 
     useEffect(() => {
         isMounted(true)
     }, []);
-
 
     useEffect(() => {
         const getData = async () => {
@@ -107,14 +104,14 @@ export const CarTestPage = ({
 
     const statistics = getStatisticsByKey(storeKey)!
 
-    const nextClick = useCallback(() => {
+    const nextButton = useCallback(() => {
         setOffset(offset + 1)
 
         statistics.currentId = currentTest?.id || ""
         setStatisticsByKey(storeKey, statistics)
     }, [currentTest?.id, offset, setStatisticsByKey, statistics, storeKey])
 
-    const prevClick = useCallback(() => {
+    const prevButton = useCallback(() => {
         if (offset != 0) {
             setOffset(offset - 1)
         } else {
@@ -125,18 +122,6 @@ export const CarTestPage = ({
             })
         }
     }, [offset, toast])
-
-    const successAnswerCount = useCallback(() => {
-        return statistics.successIds.length
-    }, [statistics?.successIds.length]);
-
-    const failAnswerCount = useCallback(() => {
-        return statistics.failedIds.length
-    }, [statistics?.failedIds.length]);
-
-    const oldAnswerCount = useCallback(() => {
-        return statistics.answeredIds.length
-    }, [statistics?.answeredIds.length]);
 
     const reset = useCallback(() => {
         carTests[clearKey]()
@@ -149,22 +134,26 @@ export const CarTestPage = ({
         const handleKeyUpProcess = (e: KeyboardEvent) => {
             switch (e.key) {
                 case 'n': {
-                    prevClick()
+                    prevButton()
                     break
                 }
                 case 'm': {
-                    nextClick()
+                    nextButton()
                     break
                 }
                 default:
                     break
             }
         }
-        document.addEventListener("keyup", handleKeyUpProcess, false)
-        return () => {
-            document.removeEventListener("keyup", handleKeyUpProcess, false)
+        if (document) {
+            document.addEventListener("keyup", handleKeyUpProcess, false)
         }
-    }, [nextClick, prevClick]);
+        return () => {
+            if (document) {
+                document.removeEventListener("keyup", handleKeyUpProcess, false)
+            }
+        }
+    }, [nextButton, prevButton]);
 
     if (!mounted) {
         return null
@@ -189,7 +178,7 @@ export const CarTestPage = ({
         successIds.push(id)
         answeredIds.push(id)
         setStatisticsByKey(storeKey, statistics)
-        nextClick()
+        nextButton()
     }
 
     const onFail = (id: string) => {
@@ -204,9 +193,8 @@ export const CarTestPage = ({
             variant: "destructive",
             description: currentTest.qname
         })
-        nextClick()
+        nextButton()
     }
-
 
     return (
         <div className="p-6">
@@ -231,43 +219,18 @@ export const CarTestPage = ({
                     再来一套
                 </Button>
             </div>
-            <div className="fixed bottom-0 right-0 flex justify-end p-3">
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <div role="button" tabIndex={0} className="mr-2 h-1/2 p-6 w-auto bg-blue-600
-                             hover:bg-blue-600/90 dark:bg-white dark:hover:bg-zinc-400 text-white dark:text-zinc-500 rounded
-                             flex items-center justify-center" onClick={prevClick}>
-                                <p>上一题</p>
-                            </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>使用快捷键n可返回上一题</p>
-                        </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <div role="button" tabIndex={0} className="ml-2 h-1/2 p-6 w-auto bg-blue-600
-                             hover:bg-blue-600/90 dark:bg-white dark:hover:bg-zinc-400 rounded text-white dark:text-zinc-500
-                             flex items-center justify-center" onClick={nextClick}>
-                                <p>下一题</p>
-                            </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>使用快捷键m可前往下一题</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+            <div className="flex items-end justify-end fixed bottom-3 right-5 ">
+                <CarTestRightBottomButton
+                    prevButton={prevButton}
+                    nextButton={nextButton}
+                />
             </div>
-            <div className="fixed bottom-0 p-3 md:font-mono">
-                分数:
-                <span className="font-bold">{successAnswerCount()}/{testPack.test.length}</span>
-                错误:
-                <span className="font-bold">{failAnswerCount()}</span>
-                <div/>
-                已答:
-                <span className="font-bold">{oldAnswerCount()}</span>
-                第<span className="font-bold">{offset + 1}</span>题
+            <div className="fixed bottom-0 p-3 font-semibold" >
+                <CarTestStatistics
+                    storeKey={storeKey}
+                    limitCount={testPack.test.length}
+                    offset={offset}
+                />
             </div>
         </div>
     )
