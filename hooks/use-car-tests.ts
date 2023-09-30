@@ -4,11 +4,6 @@ import {CarTest} from "@/lib/types";
 
 interface CarTestsPack {
     test: CarTest[]
-    // //CarTest的题目id与是否正确
-    // successIds:Set<string>
-    // failedIds:Set<string>
-    // //已回答的题目id
-    // oldIds:Set<string>
 }
 
 export interface CarTests {

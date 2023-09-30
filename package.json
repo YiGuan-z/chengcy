@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@radix-ui/react-dropdown-menu": "^2.0.5",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-toast": "^1.1.5",
@@ -31,6 +31,8 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-markdown": "^8.0.7",
+    "react-native-sound": "^0.11.2",
+    "react-native-use-sound": "^1.2.2",
     "tailwind-merge": "^1.14.0",
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",

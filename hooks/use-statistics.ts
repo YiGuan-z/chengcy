@@ -1,5 +1,7 @@
 import {create} from "zustand";
 import {persist} from "zustand/middleware";
+import {arrayToMap} from "@/lib/array-utils";
+import {mapToArray} from "@/lib/map-utils";
 
 export interface Statistics {
     successIds: string[],
@@ -14,13 +16,29 @@ export interface UseStatisticsStore {
     getStatisticsByKey: (key: string) => Statistics | null
     setStatisticsByKey: (key: string, item: Statistics) => void
     removeStatisticsByKey: (key: string) => void
+    initStatisticsByKey: (key: string) => void
+    hasKey: (key: string) => boolean
 }
 
 export const useStatistics = create(
     persist<UseStatisticsStore>(
         (set, get) => ({
             statistics: new Map<string, Statistics>(),
+            initStatisticsByKey: (key: string) => {
+                const map = new Map(get().statistics);
+                map.set(key, {
+                    successIds: [],
+                    failedIds: [],
+                    answeredIds: [],
+                    currentId: ""
+                })
+                set({statistics: map})
+            },
+            hasKey: (key: string) => {
+                return get().statistics.has(key)
+            },
             getStatisticsByKey: (key: string) => {
+                console.log(get())
                 return get().statistics.get(key) || null
             },
             setStatisticsByKey: (key: string, item: Statistics) => {
@@ -45,16 +63,22 @@ export const useStatistics = create(
                 getItem: (name) => {
                     const str = localStorage.getItem(name) || ""
                     const json = JSON.parse(str)
+                    const element = json.state.statistics;
+                    const map = arrayToMap(element);
                     return {
                         ...json,
-                        statistics: new Map(json.statistics.entries())
+                        state: {
+                            statistics: map
+                        }
                     }
                 },
                 setItem: (name, newValue) => {
+                    const statistics = newValue.state.statistics
+                    const array = mapToArray(statistics);
                     const str = JSON.stringify({
                         state: {
                             ...newValue.state,
-                            statistics: Array.from(newValue.state.statistics.entries()),
+                            statistics: array,
                         }
                     })
                     localStorage.setItem(name, str)

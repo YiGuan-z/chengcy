@@ -35,18 +35,13 @@ export const CarTestPage = ({
     const testPack = carTests[storeKey];
     const setTestPack = carTests[setStoreKey]
     //数据统计api
-    const {getStatisticsByKey, setStatisticsByKey,removeStatisticsByKey} = useStatistics()
+    const {getStatisticsByKey, setStatisticsByKey, removeStatisticsByKey,hasKey,initStatisticsByKey} = useStatistics()
     //初始化统计数据
     //如果数据不存在，则对数据进行初始化。
     useEffect(() => {
-        console.log(getStatisticsByKey(storeKey))
-        if (!getStatisticsByKey(storeKey)) {
-            setStatisticsByKey(storeKey, {
-                successIds: [],
-                failedIds: [],
-                answeredIds: [],
-                currentId: ""
-            })
+        if (!hasKey(storeKey)){
+            console.log(getStatisticsByKey(storeKey))
+            initStatisticsByKey(storeKey)
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -54,19 +49,15 @@ export const CarTestPage = ({
     const getCurrentOffset = useCallback(() => {
         const statistics = getStatisticsByKey(storeKey)
         if (!statistics) return 0
-        if (statistics.currentId=="") return 0
-        return statistics.answeredIds.findIndex((id)=>id===statistics.currentId);
+        if (statistics.currentId == "") return 0
+        return statistics.answeredIds.findIndex((id) => id === statistics.currentId);
     }, [getStatisticsByKey, storeKey]);
     //当前游标
     const [offset, setOffset] = useState(getCurrentOffset())
     const currentTest = testPack?.test[offset]
     const [mounted, isMounted] = useState(false)
 
-    const getData = async () => {
-        const response = await fetch(`${origin}${url}`)
-        const carTest1Data: CarTest[] = await response.json()
-        return carTest1Data
-    }
+
 
     useEffect(() => {
         isMounted(true)
@@ -74,6 +65,11 @@ export const CarTestPage = ({
 
 
     useEffect(() => {
+        const getData = async () => {
+            const response = await fetch(`${origin}${url}`)
+            const carTest1Data: CarTest[] = await response.json()
+            return carTest1Data
+        }
         if (!testPack) {
             const fetchData = async () => {
                 const data = await getData()
@@ -85,7 +81,6 @@ export const CarTestPage = ({
                 const statistics = getStatisticsByKey(storeKey);
                 if (statistics!.currentId == "") {
                     statistics!.currentId = data[0].id
-                    console.log(`ser`,statistics)
                     setStatisticsByKey(storeKey, statistics!)
                 }
             }
@@ -116,7 +111,7 @@ export const CarTestPage = ({
         setOffset(offset + 1)
 
         statistics.currentId = currentTest?.id || ""
-        setStatisticsByKey(storeKey,statistics)
+        setStatisticsByKey(storeKey, statistics)
     }, [currentTest?.id, offset, setStatisticsByKey, statistics, storeKey])
 
     const prevClick = useCallback(() => {
@@ -150,27 +145,26 @@ export const CarTestPage = ({
         //eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleKeyUpProcess = useCallback((e: KeyboardEvent) => {
-        switch (e.key) {
-            case 'n': {
-                prevClick()
-                break
-            }
-            case 'm': {
-                nextClick()
-                break
-            }
-            default:
-                break
-        }
-    }, [nextClick, prevClick]);
-
     useEffect(() => {
+        const handleKeyUpProcess = (e: KeyboardEvent) => {
+            switch (e.key) {
+                case 'n': {
+                    prevClick()
+                    break
+                }
+                case 'm': {
+                    nextClick()
+                    break
+                }
+                default:
+                    break
+            }
+        }
         document.addEventListener("keyup", handleKeyUpProcess, false)
         return () => {
             document.removeEventListener("keyup", handleKeyUpProcess, false)
         }
-    }, [handleKeyUpProcess]);
+    }, [nextClick, prevClick]);
 
     if (!mounted) {
         return null
@@ -181,10 +175,12 @@ export const CarTestPage = ({
 
     if (currentTest == null) {
         return (
-            <Button variant="green"
-                    onClick={reset}>
-                再来一次
-            </Button>
+            <div className="flex justify-center items-center">
+                <Button variant="green"
+                        onClick={reset}>
+                    再来一次
+                </Button>
+            </div>
         )
     }
 

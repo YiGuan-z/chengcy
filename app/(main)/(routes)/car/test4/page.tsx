@@ -1,6 +1,6 @@
 "use client"
 
-import {CarTestPage} from "@/components/car/test/CarTest";
+import {CarTestPage} from "@/components/car/test/car-test-page";
 
 const CarTest4 = () => {
     return CarTestPage({

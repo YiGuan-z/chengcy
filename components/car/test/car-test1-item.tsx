@@ -2,6 +2,7 @@ import {CarTest} from "@/lib/types";
 import {Button} from "@/components/ui/button";
 import Image from "next/image";
 import {useCallback, useEffect} from "react";
+import {strToCharSequence} from "@/lib/string-utils";
 
 export interface CarTest1ItemProps {
     item: CarTest
@@ -20,7 +21,8 @@ const CarTest1Item = ({
 
     const onClick = useCallback((symbol: string) => {
         const symbol1 = symbol.toUpperCase();
-        if (multiChoiceAnswer === symbol1) {
+        const array = strToCharSequence(multiChoiceAnswer);
+        if (array.firstHas(symbol1)) {
             onSuccess(item)
         } else {
             onFail(item)
