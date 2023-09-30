@@ -50,7 +50,7 @@ export const CarTestPage = ({
         const statistics = getStatisticsByKey(storeKey)
         if (!statistics) return 0
         if (statistics.currentId == "") return 0
-        return statistics.answeredIds.findIndex((id) => id === statistics.currentId);
+        return statistics.answeredIds.findIndex((id) => id === statistics.currentId)+1;
     }, [getStatisticsByKey, storeKey]);
     //当前游标
     const [offset, setOffset] = useState(getCurrentOffset())
@@ -140,7 +140,7 @@ export const CarTestPage = ({
 
     const reset = useCallback(() => {
         carTests[clearKey]()
-        removeStatisticsByKey(storeKey)
+        initStatisticsByKey(storeKey)
         window.location.reload()
         //eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

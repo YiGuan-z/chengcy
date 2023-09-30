@@ -38,7 +38,6 @@ export const useStatistics = create(
                 return get().statistics.has(key)
             },
             getStatisticsByKey: (key: string) => {
-                console.log(get())
                 return get().statistics.get(key) || null
             },
             setStatisticsByKey: (key: string, item: Statistics) => {
