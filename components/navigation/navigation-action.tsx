@@ -3,19 +3,22 @@
 import {useRouter} from "next/navigation";
 
 import ActionTooltip from "@/components/action-tooltip";
+import {useCallback} from "react";
 
 export interface NavigationProps {
-    title:string
+    title: string
     label: string
     destination: string,
     children: React.ReactNode,
 }
 
-const NavigationAction = ({title,label, destination, children}: NavigationProps) => {
+const NavigationAction = ({title, label, destination, children}: NavigationProps) => {
     const router = useRouter()
-    const onClick = () => {
+    const onClick = useCallback(() => {
         router.push(destination)
-    }
+
+    }, [destination, router]);
+
     return (
         <div>
             <ActionTooltip

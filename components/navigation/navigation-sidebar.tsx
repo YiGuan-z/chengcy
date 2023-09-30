@@ -1,4 +1,4 @@
-import {Car, Home} from "lucide-react";
+import {Car, Home, LucideScroll} from "lucide-react";
 
 import {ModeToggle} from "@/components/mode-toggle";
 import {Separator} from "@/components/ui/separator";
@@ -11,35 +11,35 @@ const NavigationSidebar = () => {
         h-full text-primary w-full py-3 dark:bg-[#1E1F22] bg-zinc-300/50"
 
         >
-            <NavigationAction
-                title="主页"
-                label="go to the home"
-                destination="/"
-            >
-                <Home className="group-hover:text-white transition text-emerald-500"
-                      size={25}
-                />
-            </NavigationAction>
+                <NavigationAction
+                    title="主页"
+                    label="go to the home"
+                    destination="/"
+                >
+                    <Home className="group-hover:text-white transition text-emerald-500"
+                          size={25}
+                    />
+                </NavigationAction>
 
-            <NavigationAction
-                title="科目一"
-                label="科目一练习"
-                destination="/car/test1"
-            >
-                <Car className="group-hover:text-white transition text-emerald-500"
-                     size={25}
-                />
-            </NavigationAction>
+                <NavigationAction
+                    title="科目一"
+                    label="科目一练习"
+                    destination="/car/test1"
+                >
+                    <Car className="group-hover:text-white transition text-emerald-500"
+                         size={25}
+                    />
+                </NavigationAction>
 
-            <NavigationAction
-                title="科目四"
-                label="科目四练习"
-                destination="/car/test4"
-            >
-                <Car className="group-hover:text-white transition text-emerald-500"
-                     size={25}
-                />
-            </NavigationAction>
+                <NavigationAction
+                    title="科目四"
+                    label="科目四练习"
+                    destination="/car/test4"
+                >
+                    <Car className="group-hover:text-white transition text-emerald-500"
+                         size={25}
+                    />
+                </NavigationAction>
 
             <Separator
                 className="h-[2px] bg-zinc-300 dark:bg-zinc-700

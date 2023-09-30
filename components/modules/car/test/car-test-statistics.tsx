@@ -1,6 +1,6 @@
 "use client"
 import React, {useCallback, useEffect, useState} from "react";
-import {useStatistics} from "@/hooks/use-statistics";
+import {useStatistics} from "@/components/modules/car/hooks/use-statistics";
 
 
 export interface CarTestStatisticsProps {

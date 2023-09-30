@@ -4,13 +4,14 @@ import React, {useCallback, useEffect, useState} from "react";
 
 import {CarTest} from "@/lib/types";
 import {useOrigin} from "@/hooks/use-origin";
-import {useToast} from "@/components/ui/use-toast";
-import CarTest1Item from "@/components/car/test/car-test1-item";
+import {useStartCount} from "@/hooks/use-start-count";
 import {Button} from "@/components/ui/button";
-import {useCarTests} from "@/hooks/use-car-tests";
-import {useStatistics} from "@/hooks/use-statistics";
-import CarTestStatistics from "@/components/car/test/car-test-statistics";
-import CarTestRightBottomButton from "@/components/car/test/car-test-right-bottom-button";
+import {useToast} from "@/components/ui/use-toast";
+import CarTest1Item from "@/components/modules/car/test/car-test1-item";
+import {useCarTests} from "@/components/modules/car/hooks/use-car-tests";
+import {useStatistics} from "@/components/modules/car/hooks/use-statistics";
+import CarTestStatistics from "@/components/modules/car/test/car-test-statistics";
+import CarTestRightBottomButton from "@/components/modules/car/test/car-test-right-bottom-button";
 
 export interface CarTestProps {
     url: string
@@ -20,6 +21,15 @@ export interface CarTestProps {
     clearKey: "clearTest1" | "clearTest4"
 }
 
+/**
+ * 用到了localStorage，所以只能客户端渲染。
+ * @param url api链接
+ * @param title 标题
+ * @param storeKey 存储key
+ * @param setStoreKey 设置存储key的方法
+ * @param clearKey 清除存储key的方法
+ * @constructor
+ */
 export const CarTestPage = ({
                                 url,
                                 title,
@@ -54,6 +64,7 @@ export const CarTestPage = ({
     const [offset, setOffset] = useState(getCurrentOffset())
     const currentTest = testPack?.test[offset]
     const [mounted, isMounted] = useState(false)
+    const {count,incrementCount} = useStartCount(storeKey);
     //音频
     // useSound()
 
@@ -62,6 +73,7 @@ export const CarTestPage = ({
     }, []);
 
     useEffect(() => {
+        incrementCount()
         const getData = async () => {
             const response = await fetch(`${origin}${url}`)
             const carTest1Data: CarTest[] = await response.json()
@@ -91,15 +103,16 @@ export const CarTestPage = ({
     }, []);
     // show keyboard prompt
     useEffect(() => {
-        setTimeout(() => {
-            toast({
-                variant: "default",
-                title: "提示!",
-                description: "使用键盘快捷键abcd可快速答题，使用n和m可快速切换上一个和下一个题目"
-            })
-        }, 3 * 1000)
-
-    }, [toast]);
+        if (count<10) {
+            setTimeout(() => {
+                toast({
+                    variant: "default",
+                    title: "提示!",
+                    description: "使用键盘快捷键abcd可快速答题，使用n和m可快速切换上一个和下一个题目"
+                })
+            }, 3 * 1000)
+        }
+    }, [toast,count]);
 
 
     const statistics = getStatisticsByKey(storeKey)!
@@ -198,7 +211,7 @@ export const CarTestPage = ({
 
     return (
         <div className="p-6">
-            <p className="text-center h-full">
+            <p className="text-center h-full font-semibold">
                 {title}
             </p>
             <div>
@@ -225,7 +238,7 @@ export const CarTestPage = ({
                     nextButton={nextButton}
                 />
             </div>
-            <div className="fixed bottom-0 p-3 font-semibold" >
+            <div className="fixed bottom-0 p-3 font-semibold">
                 <CarTestStatistics
                     storeKey={storeKey}
                     limitCount={testPack.test.length}

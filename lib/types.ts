@@ -1,31 +1,31 @@
-export type CarTest={
-    id:string
+export type CarTest = {
+    id: string
     //题目
-    qname:string
+    qname: string
     //与题目关联的图片
-    imgurl:string
+    imgurl: string
     //最差的回答
-    bastanswer:string
+    bastanswer: string
     //最佳答案id
-    bestanswerid:string
+    bestanswerid: string
     //该题的类型盲猜是科目一二三
-    type:string
+    type: string
     //回答
-    answer:string
+    answer: string
     //解释答案
-    explananswer:string
+    explananswer: string
     //章节ID，与我无用
-    chapterId:string
+    chapterId: string
     //错误率
-    errorRate:number
+    errorRate: number
     //选项
-    items:[
+    items: [
         {
-            name:string
-            symbol:string
-            order:number
+            name: string
+            symbol: string
+            order: number
         }
     ],
     //多选题答案
-    multiChoiceAnswer:string
+    multiChoiceAnswer: string
 }
